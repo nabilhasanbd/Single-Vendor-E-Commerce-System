@@ -15,14 +15,17 @@ use App\Http\Controllers\API\V1\ProductController;
 |
 */
 
+use App\Http\Controllers\API\AuthController;
+
 // Auth Module Routes
 Route::prefix('v1/auth')->group(function () {
-    // Route::post('/register', [AuthController::class, 'register']);
-    // Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
 });
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/v1/auth/logout', [AuthController::class, 'logout']);
     
     // User Profile
     Route::get('/v1/user', function (Request $request) {

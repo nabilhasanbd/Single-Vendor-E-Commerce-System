@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_number')->unique(); // ORD-2024-00001
             $table->foreignId('user_id')->constrained()->restrictOnDelete();
-            $table->foreignId('coupon_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('coupon_id')->nullable();
 
             // Shipping address (snapshot - user address পরে change হলেও order ঠিক থাকবে)
             $table->string('shipping_name');

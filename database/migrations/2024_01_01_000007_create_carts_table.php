@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             // user_id null = guest cart (session_id দিয়ে track)
             $table->string('session_id')->nullable()->index();
-            $table->foreignId('coupon_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('coupon_id')->nullable();
             $table->timestamps();
 
             // user অথবা session একটা থাকবেই

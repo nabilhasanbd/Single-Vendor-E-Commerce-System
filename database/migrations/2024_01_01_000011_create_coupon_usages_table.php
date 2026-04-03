@@ -34,10 +34,26 @@ return new class extends Migration
 
             $table->unique(['coupon_id', 'order_id']);
         });
+
+        Schema::table('carts', function (Blueprint $table) {
+            $table->foreign('coupon_id')->references('id')->on('coupons')->nullOnDelete();
+        });
+
+        Schema::table('orders', function (Blueprint $table) {
+            $table->foreign('coupon_id')->references('id')->on('coupons')->nullOnDelete();
+        });
     }
 
     public function down(): void
     {
+        Schema::table('carts', function (Blueprint $table) {
+            $table->dropForeign(['coupon_id']);
+        });
+
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropForeign(['coupon_id']);
+        });
+
         Schema::dropIfExists('coupon_usages');
         Schema::dropIfExists('coupons');
     }
