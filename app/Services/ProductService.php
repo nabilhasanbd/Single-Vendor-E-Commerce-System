@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
-use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Collection;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class ProductService
 {
@@ -16,57 +17,63 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-    /**
-     * Get all products.
-     */
-    public function getAllProducts(): Collection
+    public function getActiveProducts(int $perPage = 15, ?int $categoryId = null): LengthAwarePaginator
     {
-        return $this->productRepository->getAll();
+        return $this->productRepository->getAllActivePaginated($perPage, $categoryId);
     }
 
-    /**
-     * Get a single product by ID.
-     */
-    public function getProductById(int $id): ?Product
+    public function getAllProducts(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->productRepository->getById($id);
+        return $this->productRepository->getAllPaginated($perPage);
     }
 
-    /**
-     * Create a new product.
-     */
+    public function getProductById(int $id, bool $activeOnly = false): ?Product
+    {
+        $product = $this->productRepository->getById($id);
+        
+        if ($activeOnly && $product && !$product->is_active) {
+            return null;
+        }
+
+        return $product;
+    }
+
     public function createProduct(array $data): Product
     {
-        // Business logic: Generate slug if not provided
-        if (empty($data['slug']) && !empty($data['name'])) {
+        $this->validateBusinessRules($data);
+
+        if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['name']);
         }
         
-        // Any other business logic goes here before saving
-        
+        $data['is_active'] = $data['is_active'] ?? true;
+
         return $this->productRepository->create($data);
     }
 
-    /**
-     * Update an existing product.
-     */
     public function updateProduct(int $id, array $data): bool
     {
-        // Business logic: Update slug if name gets updated
-        if (isset($data['name']) && empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['name']);
-        }
+        $this->validateBusinessRules($data);
 
         return $this->productRepository->update($id, $data);
     }
 
-    /**
-     * Delete a product.
-     */
     public function deleteProduct(int $id): bool
     {
-        // Check if product can be deleted (e.g. check open orders here)
-        
         return $this->productRepository->delete($id);
+    }
+
+    /**
+     * Enforce core business logic
+     */
+    private function validateBusinessRules(array $data): void
+    {
+        if (isset($data['price']) && $data['price'] < 0) {
+            throw new InvalidArgumentException("Product price cannot be negative.");
+        }
+
+        if (isset($data['stock']) && $data['stock'] < 0) {
+            throw new InvalidArgumentException("Product stock cannot be negative.");
+        }
     }
 }

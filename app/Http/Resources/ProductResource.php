@@ -7,11 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -22,7 +17,8 @@ class ProductResource extends JsonResource
             'price' => (float) $this->price,
             'stock' => (int) $this->stock,
             'category_id' => $this->category_id,
-            'status' => $this->status,
+            'image_url' => $this->image_url,
+            'is_active' => (bool) $this->is_active,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
         ];

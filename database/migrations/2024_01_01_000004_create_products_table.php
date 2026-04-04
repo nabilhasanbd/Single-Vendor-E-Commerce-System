@@ -16,11 +16,9 @@ return new class extends Migration
             $table->string('sku')->unique()->nullable(); // Stock Keeping Unit
             $table->text('short_description')->nullable();
             $table->longText('description')->nullable();
-            $table->decimal('price', 10, 2); // base price
-            $table->decimal('sale_price', 10, 2)->nullable(); // discounted price
-            $table->integer('stock_quantity')->default(0);
-            $table->integer('low_stock_threshold')->default(5); // alert এর জন্য
-            $table->boolean('manage_stock')->default(true);
+            $table->decimal('price', 10, 2); 
+            $table->integer('stock')->default(0);
+            $table->string('image_url')->nullable();
             $table->enum('stock_status', ['in_stock', 'out_of_stock', 'pre_order'])->default('in_stock');
             $table->decimal('weight', 8, 2)->nullable(); // shipping calculation এর জন্য
             $table->json('dimensions')->nullable(); // {"length": 10, "width": 5, "height": 3}

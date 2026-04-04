@@ -2,20 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\V1\ProductController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ProductController;
 
 // Auth Module Routes
 Route::prefix('v1/auth')->group(function () {
@@ -31,44 +19,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/v1/user', function (Request $request) {
         return $request->user();
     });
-
-    Route::prefix('v1')->group(function () {
-        
-        // Category Module
-        Route::prefix('categories')->group(function () {
-            // Route::get('/', [CategoryController::class, 'index']);
-            // Route::post('/', [CategoryController::class, 'store']);
-        });
-
-        // Product Module
-        Route::prefix('products')->group(function () {
-            Route::get('/', [ProductController::class, 'index']);
-            Route::post('/', [ProductController::class, 'store']);
-            Route::get('/{id}', [ProductController::class, 'show']);
-            Route::put('/{id}', [ProductController::class, 'update']);
-            Route::delete('/{id}', [ProductController::class, 'destroy']);
-        });
-
-        // Cart Module
-        Route::prefix('cart')->group(function () {
-            // Route::get('/', [CartController::class, 'index']);
-        });
-
-        // Order Module
-        Route::prefix('orders')->group(function () {
-            // Route::get('/', [OrderController::class, 'index']);
-        });
-
-        // Payment Module
-        Route::prefix('payments')->group(function () {
-            // Route::post('/process', [PaymentController::class, 'process']);
-        });
-        
-    });
 });
 
-// Public Product Routes (If products should be visible to guests)
+// Public Product Routes
 Route::prefix('v1/public/products')->group(function () {
     Route::get('/', [ProductController::class, 'index']);
     Route::get('/{id}', [ProductController::class, 'show']);
+});
+
+// Admin Product Routes (Protected)
+Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function () {
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 });
