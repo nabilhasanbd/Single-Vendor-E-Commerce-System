@@ -32,6 +32,8 @@ Route::prefix('products')->group(function () {
     Route::get('/{id}', [ProductWebController::class, 'show'])->name('products.show');
 });
 
+use App\Http\Controllers\Web\CategoryWebController;
+
 // Admin Control Panel Routes
 Route::middleware(['auth', 'admin'])->prefix('admin/products')->name('admin.products.')->group(function () {
     Route::get('/create', [ProductWebController::class, 'create'])->name('create');
@@ -39,4 +41,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin/products')->name('admin.prod
     Route::get('/{id}/edit', [ProductWebController::class, 'edit'])->name('edit');
     Route::put('/{id}', [ProductWebController::class, 'update'])->name('update');
     Route::delete('/{id}', [ProductWebController::class, 'destroy'])->name('destroy');
+});
+
+// Admin Category Routes
+Route::middleware(['auth', 'admin'])->prefix('admin/categories')->name('admin.categories.')->group(function () {
+    Route::get('/create', [CategoryWebController::class, 'create'])->name('create');
+    Route::post('/', [CategoryWebController::class, 'store'])->name('store');
 });

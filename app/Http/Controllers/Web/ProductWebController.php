@@ -7,15 +7,18 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use App\Services\CategoryService;
 use Exception;
 
 class ProductWebController extends Controller
 {
     protected ProductService $productService;
+    protected CategoryService $categoryService;
 
-    public function __construct(ProductService $productService)
+    public function __construct(ProductService $productService, CategoryService $categoryService)
     {
         $this->productService = $productService;
+        $this->categoryService = $categoryService;
     }
 
     // --- User Side ---
@@ -40,7 +43,13 @@ class ProductWebController extends Controller
 
     public function create()
     {
-        return view('admin.products.create');
+        $categories = $this->categoryService->getAllActiveCategories();
+        
+        if ($categories->isEmpty()) {
+            return redirect()->route('admin.categories.create')->with('error', 'You must create a category before adding a product!');
+        }
+
+        return view('admin.products.create', compact('categories'));
     }
 
     public function store(StoreProductRequest $request)
@@ -59,7 +68,9 @@ class ProductWebController extends Controller
         if (!$product) {
             abort(404, 'Product not found');
         }
-        return view('admin.products.edit', compact('product'));
+        $categories = $this->categoryService->getAllActiveCategories();
+        
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     public function update(UpdateProductRequest $request, int $id)

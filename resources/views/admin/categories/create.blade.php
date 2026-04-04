@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Product</title>
+    <title>Create Category</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --secondary: #ec4899;
+            --primary: #ec4899;
+            --primary-hover: #db2777;
+            --secondary: #6366f1;
             --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
             --card-bg: rgba(255, 255, 255, 0.9);
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --input-border: #d1d5db;
-            --input-focus: #818cf8;
+            --input-focus: #f472b6;
             --border-radius: 16px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -139,14 +139,14 @@
 
         textarea {
             resize: vertical;
-            min-height: 120px;
+            min-height: 100px;
         }
 
         input:focus,
         textarea:focus,
         select:focus {
             border-color: var(--input-focus);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2);
             background: #ffffff;
         }
 
@@ -162,7 +162,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
+            box-shadow: 0 4px 14px 0 rgba(236, 72, 153, 0.39);
             margin-top: 1rem;
         }
 
@@ -170,19 +170,13 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
         }
-        
-        @media (max-width: 640px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
     
     <div class="container">
         <div class="header">
-            <h2>Add New Product</h2>
+            <h2>Add New Category</h2>
             <a href="{{ route('dashboard') }}" class="btn-outline">Back to Dashboard</a>
         </div>
 
@@ -201,47 +195,32 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.products.store') }}" method="POST">
+        <form action="{{ route('admin.categories.store') }}" method="POST">
             @csrf
             
-            <div class="form-group">
-                <label>Product Name</label> 
-                <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Wireless Noise-Cancelling Headphones" required>
-            </div>
-
             <div class="form-row">
                 <div class="form-group">
-                    <label>Price ($)</label> 
-                    <input type="number" step="0.01" name="price" value="{{ old('price') }}" placeholder="0.00" required>
+                    <label>Category Name</label> 
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Electronics" required>
                 </div>
                 
                 <div class="form-group">
-                    <label>Stock Quantity</label> 
-                    <input type="number" name="stock" value="{{ old('stock') }}" placeholder="e.g. 50" required>
+                    <label>Sort Order</label> 
+                    <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}" required>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label>Category</label> 
-                <select name="category_id" required>
-                    <option value="" disabled selected>Select an active category...</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}" @if(old('category_id') == $category->id) selected @endif>{{ $category->name }}</option>
-                    @endforeach
-                </select>
             </div>
 
             <div class="form-group">
                 <label>Image URL (Optional)</label> 
-                <input type="url" name="image_url" value="{{ old('image_url') }}" placeholder="https://example.com/image.jpg">
+                <input type="url" name="image" value="{{ old('image') }}" placeholder="https://example.com/logo.jpg">
             </div>
             
             <div class="form-group">
                 <label>Description (Optional)</label> 
-                <textarea name="description" placeholder="Write a brief overview of what this product is...">{{ old('description') }}</textarea>
+                <textarea name="description" placeholder="A brief overview of the category...">{{ old('description') }}</textarea>
             </div>
 
-            <button type="submit" class="btn-submit">Launch Product into Catalog</button>
+            <button type="submit" class="btn-submit">Publish Category</button>
         </form>
     </div>
 
