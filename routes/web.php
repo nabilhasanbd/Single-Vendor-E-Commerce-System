@@ -24,6 +24,27 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // Cart Routes
+    Route::prefix('cart')->name('cart.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Web\CartWebController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Web\CartWebController::class, 'store'])->name('store');
+        Route::put('/{id}', [\App\Http\Controllers\Web\CartWebController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Web\CartWebController::class, 'destroy'])->name('destroy');
+    });
+
+    // Checkout Routes
+    Route::get('/checkout', [\App\Http\Controllers\Web\CheckoutWebController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [\App\Http\Controllers\Web\CheckoutWebController::class, 'store'])->name('checkout.store');
+
+    // Orders Routes
+    Route::get('/orders', [\App\Http\Controllers\Web\CheckoutWebController::class, 'orders'])->name('orders.index');
+    Route::get('/orders/{id}', [\App\Http\Controllers\Web\CheckoutWebController::class, 'showOrder'])->name('orders.show');
+
+    // SSLCommerz Web Hooks (Placeholders)
+    Route::get('/payment/success', [\App\Http\Controllers\Web\CheckoutWebController::class, 'sslSuccess'])->name('payment.success');
+    Route::get('/payment/fail', [\App\Http\Controllers\Web\CheckoutWebController::class, 'sslFail'])->name('payment.fail');
+    Route::get('/payment/cancel', [\App\Http\Controllers\Web\CheckoutWebController::class, 'sslCancel'])->name('payment.cancel');
 });
 
 // User Product Routes

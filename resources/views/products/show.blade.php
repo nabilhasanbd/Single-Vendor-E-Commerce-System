@@ -250,7 +250,12 @@
                 </div>
 
                 <div class="action-area">
-                    <button class="btn-cart">Add to Cart</button>
+                    <form action="{{ route('cart.store') }}" method="POST" style="width:100%; display:flex;">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn-cart">Add to Cart</button>
+                    </form>
                 </div>
 
             </div>

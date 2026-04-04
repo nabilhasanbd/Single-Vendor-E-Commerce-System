@@ -11,7 +11,7 @@ Route::prefix('v1/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-// Protected Routes
+// Cart Routes (Protected)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/v1/auth/logout', [AuthController::class, 'logout']);
     
@@ -19,6 +19,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/v1/user', function (Request $request) {
         return $request->user();
     });
+
+    // Cart
+    Route::prefix('v1/cart')->group(function () {
+        Route::get('/', [\App\Http\Controllers\API\CartController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\API\CartController::class, 'store']);
+        Route::put('/{id}', [\App\Http\Controllers\API\CartController::class, 'update']);
+        Route::delete('/{id}', [\App\Http\Controllers\API\CartController::class, 'destroy']);
+    });
+
+    // Checkout & Orders
+    Route::post('/v1/checkout', [\App\Http\Controllers\API\CheckoutController::class, 'store']);
+    Route::get('/v1/orders', [\App\Http\Controllers\API\CheckoutController::class, 'index']);
+    Route::get('/v1/orders/{id}', [\App\Http\Controllers\API\CheckoutController::class, 'show']);
 });
 
 // Public Product Routes
