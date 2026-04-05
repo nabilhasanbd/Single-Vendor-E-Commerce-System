@@ -201,7 +201,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.products.store') }}" method="POST">
+        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             <div class="form-group">
@@ -232,8 +232,8 @@
             </div>
 
             <div class="form-group">
-                <label>Image URL (Optional)</label> 
-                <input type="url" name="image_url" value="{{ old('image_url') }}" placeholder="https://example.com/image.jpg">
+                <label>Product Image</label> 
+                <input type="file" name="image" accept="image/*">
             </div>
             
             <div class="form-group">

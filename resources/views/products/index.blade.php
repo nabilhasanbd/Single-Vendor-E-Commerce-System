@@ -72,6 +72,44 @@
             box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
         }
 
+        .btn-outline {
+            text-decoration: none;
+            color: var(--text-main);
+            background: transparent;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            font-weight: 500;
+            transition: var(--transition);
+            border: 2px solid var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+
         /* Grid Layout */
         .products-grid {
             display: grid;
@@ -218,17 +256,34 @@
 
     <div class="header">
         <h2>Explore Premium Collection</h2>
-        <a href="{{ route('dashboard') }}" class="btn-dashboard">
-            Dashboard
-        </a>
+        <div class="nav-links">
+            @guest
+                <a href="{{ route('login') }}" class="btn-outline">Login</a>
+                <a href="{{ route('register') }}" class="btn-dashboard">Register</a>
+            @endguest
+            @auth
+                <a href="{{ route('cart.index') }}" class="btn-outline">Cart</a>
+                <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn-dashboard" style="border:none; cursor:pointer; font-family: 'Outfit', sans-serif; font-size: 1rem;">Logout</button>
+                </form>
+            @endauth
+        </div>
     </div>
+
+    @if(session('success'))
+        <div class="alert">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-error">{{ session('error') }}</div>
+    @endif
 
     <div class="products-grid">
         @forelse($products as $product)
             <div class="product-card">
                 <div class="product-image-container">
                     @if($product->image_url)
-                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-image">
+                        <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}" class="product-image">
                     @else
                         <span class="no-image">Image not available</span>
                     @endif
@@ -247,7 +302,13 @@
                     @endif
                 </div>
 
-                <div class="product-action">
+                <div class="product-action" style="display: flex; gap: 0.5rem; flex-direction: column;">
+                    <form action="{{ route('cart.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn-view" style="background: linear-gradient(to right, var(--primary), var(--secondary)); color: white; border-color: transparent;">Add to Cart</button>
+                    </form>
                     <a href="{{ route('products.show', $product->id) }}" class="btn-view">
                         View Details
                     </a>

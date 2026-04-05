@@ -66,6 +66,46 @@
             transform: translateX(-5px);
         }
 
+        .btn-dashboard {
+            text-decoration: none;
+            color: white;
+            background: var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
+        }
+
+        .btn-dashboard:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-outline {
+            text-decoration: none;
+            color: var(--text-main);
+            background: transparent;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            font-weight: 500;
+            transition: var(--transition);
+            border: 2px solid var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
         .page-title {
             font-size: 2.5rem;
             font-weight: 700;
@@ -240,7 +280,15 @@
         
         <div class="nav-bar">
             <a href="{{ route('products.index') }}" class="btn-back">← Continue Shopping</a>
-            <h1 class="page-title">Your Cart</h1>
+            <h1 class="page-title" style="flex:1; text-align:center;">Your Cart</h1>
+            <div class="nav-links">
+                @auth
+                    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn-dashboard" style="border:none; cursor:pointer; font-family: 'Outfit', sans-serif; font-size: 1rem;">Logout</button>
+                    </form>
+                @endauth
+            </div>
         </div>
 
         @if(session('success'))
@@ -275,23 +323,22 @@
                             <td>
                                 <div class="product-info">
                                     @if($item->product->image_url)
-                                        <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="product-img">
+                                        <img src="{{ asset('storage/' . $item->product->image_url) }}" alt="{{ $item->product->name }}" class="product-img">
                                     @else
                                         <div class="product-img" style="display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;">No Img</div>
                                     @endif
                                     <span class="product-name">{{ $item->product->name }}</span>
                                 </div>
                             </td>
-                            <td style="font-weight: 600; color: var(--text-muted);">${{ number_format($item->unit_price, 2) }}</td>
+                            <td style="font-weight: 600; color: var(--text-muted);">$<span class="unit-price">{{ number_format($item->unit_price, 2) }}</span></td>
                             <td>
-                                <form action="{{ route('cart.update', $item->id) }}" method="POST" class="qty-controls">
+                                <form action="{{ route('cart.update', $item->id) }}" method="POST" class="qty-controls update-cart-form">
                                     @csrf
                                     @method('PUT')
-                                    <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="qty-input">
-                                    <button type="submit" class="btn-update">Update</button>
+                                    <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="qty-input" data-id="{{ $item->id }}" data-price="{{ $item->unit_price }}" onchange="updateRow(this)">
                                 </form>
                             </td>
-                            <td style="font-weight: 700; color: var(--text-main); font-size: 1.1rem">${{ number_format($item->subtotal, 2) }}</td>
+                            <td style="font-weight: 700; color: var(--text-main); font-size: 1.1rem">$<span class="subtotal" id="subtotal-{{ $item->id }}">{{ number_format($item->subtotal, 2) }}</span></td>
                             <td>
                                 <form action="{{ route('cart.destroy', $item->id) }}" method="POST">
                                     @csrf
@@ -307,7 +354,7 @@
                 <div class="cart-summary">
                     <div>
                         <span style="color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Estimated Total</span>
-                        <div class="total-price">${{ number_format($cart->total_amount, 2) }}</div>
+                        <div class="total-price">$<span id="cart-total">{{ number_format($cart->total_amount, 2) }}</span></div>
                     </div>
                     <a href="{{ route('checkout.index') }}" class="btn-checkout">Proceed to Checkout</a>
                 </div>
@@ -321,5 +368,44 @@
 
     </div>
 
+    <script>
+        function updateRow(input) {
+            let id = input.getAttribute('data-id');
+            let price = parseFloat(input.getAttribute('data-price'));
+            let qty = parseInt(input.value) || 1;
+            
+            // update subtotal dynamically
+            let subtotal = price * qty;
+            document.getElementById('subtotal-' + id).innerText = subtotal.toFixed(2);
+            
+            // update cart total
+            let total = 0;
+            document.querySelectorAll('.subtotal').forEach(el => {
+                total += parseFloat(el.innerText);
+            });
+            document.getElementById('cart-total').innerText = total.toFixed(2);
+
+            // Fetch to backend
+            let form = input.closest('form');
+            let url = form.getAttribute('action');
+            let token = form.querySelector('input[name="_token"]').value;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    _method: 'PUT',
+                    quantity: qty
+                })
+            }).then(response => {
+                if(!response.ok) {
+                    console.error("Failed to update cart!");
+                }
+            }).catch(console.error);
+        }
+    </script>
 </body>
 </html>

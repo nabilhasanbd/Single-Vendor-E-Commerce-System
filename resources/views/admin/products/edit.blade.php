@@ -201,7 +201,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.products.update', $product->id) }}" method="POST">
+        <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -242,8 +242,13 @@
             </div>
 
             <div class="form-group">
-                <label>Image URL (Optional)</label> 
-                <input type="url" name="image_url" value="{{ old('image_url', $product->image_url) }}">
+                <label>Product Image</label> 
+                <input type="file" name="image" accept="image/*">
+                @if($product->image_url)
+                    <div style="margin-top: 10px;">
+                        <img src="{{ asset('storage/' . $product->image_url) }}" alt="Current Image" style="max-height: 100px; border-radius: 8px;">
+                    </div>
+                @endif
             </div>
             
             <div class="form-group">

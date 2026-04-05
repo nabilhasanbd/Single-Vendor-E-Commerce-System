@@ -67,6 +67,46 @@
             box-shadow: 0 6px 10px -1px rgba(0, 0, 0, 0.1);
         }
 
+        .btn-dashboard {
+            text-decoration: none;
+            color: white;
+            background: var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
+        }
+
+        .btn-dashboard:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-outline {
+            text-decoration: none;
+            color: var(--text-main);
+            background: transparent;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            font-weight: 500;
+            transition: var(--transition);
+            border: 2px solid var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
         /* Product Main Card */
         .product-wrapper {
             background: var(--card-bg);
@@ -211,17 +251,31 @@
 
     <div class="container">
         
-        <div class="nav-bar">
+        <div class="nav-bar" style="display: flex; justify-content: space-between; align-items: center;">
             <a href="{{ route('products.index') }}" class="btn-back">
                 ← Back to Catalog
             </a>
+            
+            <div class="nav-links">
+                @guest
+                    <a href="{{ route('login') }}" class="btn-outline">Login</a>
+                    <a href="{{ route('register') }}" class="btn-dashboard">Register</a>
+                @endguest
+                @auth
+                    <a href="{{ route('cart.index') }}" class="btn-outline">Cart</a>
+                    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn-dashboard" style="border:none; cursor:pointer; font-family: 'Outfit', sans-serif; font-size: 1rem;">Logout</button>
+                    </form>
+                @endauth
+            </div>
         </div>
 
         <div class="product-wrapper">
             
             <div class="image-section">
                 @if($product->image_url)
-                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-image">
+                    <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}" class="product-image">
                 @else
                     <div class="no-image">No Image Available</div>
                 @endif

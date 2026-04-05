@@ -55,7 +55,13 @@ class ProductWebController extends Controller
     public function store(StoreProductRequest $request)
     {
         try {
-            $this->productService->createProduct($request->validated());
+            $data = $request->validated();
+            if ($request->hasFile('image')) {
+                $data['image_url'] = $request->file('image')->store('products', 'public');
+            }
+            unset($data['image']);
+            
+            $this->productService->createProduct($data);
             return redirect()->route('admin.products.create')->with('success', 'Product created successfully.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()])->withInput();
@@ -76,7 +82,13 @@ class ProductWebController extends Controller
     public function update(UpdateProductRequest $request, int $id)
     {
         try {
-            $updated = $this->productService->updateProduct($id, $request->validated());
+            $data = $request->validated();
+            if ($request->hasFile('image')) {
+                $data['image_url'] = $request->file('image')->store('products', 'public');
+            }
+            unset($data['image']);
+            
+            $updated = $this->productService->updateProduct($id, $data);
             if (!$updated) {
                 return back()->withErrors(['error' => 'Product not found.']);
             }
