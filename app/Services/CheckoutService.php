@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Repositories\Interfaces\CartRepositoryInterface;
 use App\Repositories\Interfaces\OrderRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Str;
@@ -116,13 +117,28 @@ class CheckoutService
         });
     }
 
-    public function getUserOrders(int $userId)
+    public function getUserOrders(int $userId, int $perPage = 10): LengthAwarePaginator
     {
-        return $this->orderRepository->getUserOrders($userId);
+        return $this->orderRepository->getUserOrders($userId, $perPage);
     }
     
     public function getOrder(int $orderId, int $userId)
     {
         return $this->orderRepository->getOrderByIdAndUser($orderId, $userId);
+    }
+
+    public function getOrderById(int $orderId)
+    {
+        return $this->orderRepository->getOrderById($orderId);
+    }
+
+    public function getAllOrders(int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->orderRepository->getAllOrders($perPage);
+    }
+
+    public function updateOrderStatus(int $orderId, string $status)
+    {
+        return $this->orderRepository->updateOrderStatus($orderId, $status);
     }
 }

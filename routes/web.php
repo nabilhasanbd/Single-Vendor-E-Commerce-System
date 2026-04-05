@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+    Route::view('/profile', 'profile')->name('profile');
+
     // Cart Routes
     Route::prefix('cart')->name('cart.')->group(function () {
         Route::get('/', [CartWebController::class, 'index'])->name('index');
@@ -51,16 +53,25 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin Control Panel Routes
-Route::middleware(['auth', 'admin'])->prefix('admin/products')->name('admin.products.')->group(function () {
-    Route::get('/create', [ProductWebController::class, 'create'])->name('create');
-    Route::post('/', [ProductWebController::class, 'store'])->name('store');
-    Route::get('/{id}/edit', [ProductWebController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [ProductWebController::class, 'update'])->name('update');
-    Route::delete('/{id}', [ProductWebController::class, 'destroy'])->name('destroy');
-});
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Products
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/create', [ProductWebController::class, 'create'])->name('create');
+        Route::post('/', [ProductWebController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ProductWebController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ProductWebController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ProductWebController::class, 'destroy'])->name('destroy');
+    });
 
-// Admin Category Routes
-Route::middleware(['auth', 'admin'])->prefix('admin/categories')->name('admin.categories.')->group(function () {
-    Route::get('/create', [CategoryWebController::class, 'create'])->name('create');
-    Route::post('/', [CategoryWebController::class, 'store'])->name('store');
+    // Categories
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/create', [CategoryWebController::class, 'create'])->name('create');
+        Route::post('/', [CategoryWebController::class, 'store'])->name('store');
+    });
+
+    // Orders
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [CheckoutWebController::class, 'adminOrders'])->name('index');
+        Route::put('/{id}/status', [CheckoutWebController::class, 'updateOrderStatus'])->name('update-status');
+    });
 });

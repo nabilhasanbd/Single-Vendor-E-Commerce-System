@@ -26,7 +26,8 @@ class ProductController extends BaseController
     {
         try {
             $categoryId = $request->query('category_id');
-            $products = $this->productService->getActiveProducts(15, $categoryId);
+            $search = $request->query('search');
+            $products = $this->productService->getActiveProducts(15, $categoryId, $search);
             
             return $this->successResponse(
                 ProductResource::collection($products)->response()->getData(true),

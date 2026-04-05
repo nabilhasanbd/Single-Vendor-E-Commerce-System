@@ -26,8 +26,11 @@ class ProductWebController extends Controller
     public function index(Request $request)
     {
         $categoryId = $request->query('category_id');
-        $products = $this->productService->getActiveProducts(10, $categoryId);
-        return view('products.index', compact('products'));
+        $search = $request->query('search');
+        $products = $this->productService->getActiveProducts(10, $categoryId, $search);
+        $categories = $this->categoryService->getAllActiveCategories();
+        
+        return view('products.index', compact('products', 'categories'));
     }
 
     public function show(int $id)

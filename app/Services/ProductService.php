@@ -17,9 +17,9 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-    public function getActiveProducts(int $perPage = 15, ?int $categoryId = null): LengthAwarePaginator
+    public function getActiveProducts(int $perPage = 15, ?int $categoryId = null, ?string $search = null): LengthAwarePaginator
     {
-        return $this->productRepository->getAllActivePaginated($perPage, $categoryId);
+        return $this->productRepository->getAllActivePaginated($perPage, $categoryId, $search);
     }
 
     public function getAllProducts(int $perPage = 15): LengthAwarePaginator

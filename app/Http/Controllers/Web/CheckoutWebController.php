@@ -48,11 +48,31 @@ class CheckoutWebController extends Controller
 
     public function showOrder(int $id)
     {
-        $order = $this->checkoutService->getOrder($id, Auth::id());
+        $order = Auth::user()->role === 'admin' 
+            ? $this->checkoutService->getOrderById($id) 
+            : $this->checkoutService->getOrder($id, Auth::id());
+
         if (!$order) {
             abort(404, 'Order not found or unauthorized access.');
         }
         return view('orders.show', compact('order'));
+    }
+
+    public function adminOrders()
+    {
+        $orders = $this->checkoutService->getAllOrders();
+        return view('orders.index', compact('orders'));
+    }
+
+    public function updateOrderStatus(Request $request, int $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
+        ]);
+
+        $this->checkoutService->updateOrderStatus($id, $request->status);
+
+        return back()->with('success', 'Order status updated successfully.');
     }
 
     // SSLCommerz Web Hooks (Placeholders)

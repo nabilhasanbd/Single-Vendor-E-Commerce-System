@@ -1,50 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Detail</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #6366f1; --card-bg: rgba(255, 255, 255, 0.95); --text-main: #1f2937; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); padding: 4rem 2rem; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 900px; background: var(--card-bg); padding: 3rem; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #f3f4f6; margin-bottom: 2rem; padding-bottom: 1rem; }
-        .badge { background: #d1fae5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 999px; font-weight: 600;}
-        table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
-        th, td { padding: 1rem; border-bottom: 1px solid #f3f4f6; text-align: left;}
-        .total-row { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-align: right; margin-top: 1.5rem;}
-        .alert { padding: 1rem; background: #d1fae5; color: #065f46; border-radius: 8px; margin-bottom: 2rem; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        @if(session('success'))
-            <div class="alert">{{ session('success') }}</div>
-        @endif
+@extends('layouts.app')
 
-        <a href="{{ route('orders.index') }}" style="display:inline-block; margin-bottom: 1rem; color: var(--primary); font-weight:600; text-decoration: none;">← My Orders</a>
-        
-        <div class="header">
+@section('title', $order->order_number . ' — ' . config('app.name'))
+
+@push('styles')
+<style>
+    :root { --primary: #6366f1; --card-bg: rgba(255, 255, 255, 0.95); }
+    .order-detail-card { background: var(--card-bg); padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); max-width: 900px; margin: 0 auto; }
+    .order-header { display: flex; justify-content: space-between; border-bottom: 2px solid #f3f4f6; margin-bottom: 2rem; padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+    .badge-pill { background: #d1fae5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 999px; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+    th, td { padding: 1rem; border-bottom: 1px solid #f3f4f6; text-align: left; }
+    .total-row { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-align: right; margin-top: 1.5rem; }
+</style>
+@endpush
+
+@section('content')
+    <div class="order-detail-card">
+        <a href="{{ auth()->user()->role === 'admin' ? route('admin.orders.index') : route('orders.index') }}" class="d-inline-block mb-3 fw-semibold text-decoration-none">
+            ← {{ auth()->user()->role === 'admin' ? 'All Orders' : 'My Orders' }}
+        </a>
+
+        <div class="order-header">
             <div>
-                <h1 style="color: var(--primary);">{{ $order->order_number }}</h1>
-                <p style="color: #6b7280;">Placed on {{ $order->created_at->format('M d, Y h:i A') }}</p>
+                <h1 class="h3" style="color: var(--primary);">{{ $order->order_number }}</h1>
+                <p class="text-muted mb-0">Placed on {{ $order->created_at->format('M d, Y h:i A') }}</p>
             </div>
-            <div style="text-align: right;">
-                <div style="margin-bottom: 0.5rem;"><span class="badge" style="text-transform: uppercase;">Order: {{ $order->status }}</span></div>
-                <div><span class="badge" style="background:#fef3c7; color:#d97706; text-transform: uppercase;">Payment: {{ $order->payment_status }} ({{ strtoupper($order->payment_method) }})</span></div>
+            <div class="text-md-end">
+                <div class="mb-1"><span class="badge-pill text-uppercase">Order: {{ $order->status }}</span></div>
+                <div><span class="badge-pill text-uppercase" style="background:#fef3c7; color:#d97706;">Payment: {{ $order->payment_status }} ({{ strtoupper($order->payment_method) }})</span></div>
             </div>
         </div>
 
-        <div style="background: #f9fafb; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+        <div class="bg-light p-3 rounded-3 mb-4">
             <strong>Shipping To:</strong><br>
             {{ $order->shipping_name }}<br>
             {{ $order->shipping_address_line1 }}, {{ $order->shipping_city }}<br>
             Phone: {{ $order->shipping_phone }}
         </div>
 
-        <h3>Items Ordered</h3>
+        <h3 class="h5 mb-3">Items Ordered</h3>
         <table>
             <thead>
                 <tr>
@@ -70,5 +64,4 @@
             Grand Total: ${{ number_format($order->total_amount, 2) }}
         </div>
     </div>
-</body>
-</html>
+@endsection
